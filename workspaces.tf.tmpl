@@ -1,0 +1,37 @@
+{% for workspace in workspaces }
+resource "harness_platform_workspace" "{{ workspace.id }}" {
+  name                    = {{ workspace.name }}
+  identifier              = {{ workspace.id }}
+  org_id                  = {{ org_id }}
+  project_id              = {{ project_id }}
+
+  provider_connector      = "{{ workspace.provider_connector }}"
+  
+  provisioner_type        = "{{ workspace.provisioner_type }}"
+  provisioner_version     = "{{ workspace.provisioner_version }}"
+
+  repository_connector    = "{{ workspace.repository_connector }}"
+  repository              = "{{ workspace.repository }}"
+  repository_branch       = "{{ workspace.repository_branch }}"
+  repository_path         = "{{ workspace.repository_path }}"
+  
+  cost_estimation_enabled = {{ workspace.cost_estimation_enabled }}
+  
+  {% for variable in workspace.terraform_variables }
+  terraform_variable {
+    key        = "{{ variable.key }}"
+    value      = "{{ variable.value }}"
+    value_type = "{{ variable.type }}"
+  }
+  {% endfor }
+
+  {% for variable in workspace.environment_variables }
+  environment_variable {
+    key        = "{{ variable.key }}"
+    value      = "{{ variable.value }}"
+    value_type = "{{ variable.type }}"
+  }
+  {% endfor }
+}
+
+{% endfor }

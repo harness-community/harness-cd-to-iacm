@@ -1,0 +1,14 @@
+create_workspaces = true
+interactive = true
+
+[harness]
+endpoint = "https://app.harness.io"
+account_id = "XXXX"
+platform_api_key = "XXXX"
+org_id = "XXXX"
+project_id = "XXXX"
+pipeline_identifier = "XXXX"
+
+[terraform]
+provisioner = "opentofu"
+provisioner_version = "1.8.0"
