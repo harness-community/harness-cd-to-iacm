@@ -40,13 +40,15 @@ provisioner = "opentofu"
 provisioner_version = "1.8.0"
 ```
 
+you can specify the location of the config file by setting the `CONFIG_FILE` environment variable
+
 ## usage
 
 set your configuration file according to above and execute the program:
 ```shell
-docker run --rm -it $(docker build -q .)
+docker run --rm -v "$(pwd)/config.toml:/harness/config.toml" -e CONFIG_FILE=/harness/config.toml -it harnesscommunity/harness-cd-to-iacm
 ```
-this command silenty builds an un-tagged image and executes it
+this command mounts the config file into the container and sets the environment variable to point to it
 
 ## developemnt notes
 

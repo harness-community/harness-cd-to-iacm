@@ -1,5 +1,6 @@
 import json
 import logging
+from os import getenv
 
 import toml
 from requests import post
@@ -122,12 +123,10 @@ def get_pipeline_steps(
         account_id,
         org_id,
         project_id,
-        # limit=config["executions"].get("limit", 50),
-        # page=config["executions"].get("page", 1),
         # workspace=config["executions"].get("workspace", None),
         # pipeline_execution_id=config["executions"].get("pipeline_execution_id", None),
         # status=config["executions"].get("status", None),
-        # pipeline_identifier=config["executions"].get("pipeline_identifier", None),
+        pipeline_identifier=pipeline_id,
         # start_time=config["executions"].get("start_time", None),
         # end_time=config["executions"].get("end_time", None),
         body={"filterType": "PipelineExecution", "pipelineIdentifier": pipeline_id},
@@ -277,7 +276,7 @@ if __name__ == "__main__":
     created_workspaces = []
 
     # load in configuration
-    with open("config.toml", "r") as f:
+    with open(getenv("CONFIG_FILE", "config.toml"), "r") as f:
         config = toml.load(f)
 
     # set up authentication for the sdk
@@ -290,7 +289,7 @@ if __name__ == "__main__":
         config["harness"]["account_id"],
         config["harness"]["org_id"],
         config["harness"]["project_id"],
-        "TERRAFORM_PLAN_V2",
+        config["harness"].get("step_type", "TERRAFORM_PLAN_V2"),
         config["harness"]["pipeline_identifier"],
     )
 
@@ -342,9 +341,12 @@ if __name__ == "__main__":
             "repository": step["configuration"]["configFiles"]["store"]["spec"][
                 "repoName"
             ],
-            "repository_branch": step["configuration"]["configFiles"]["store"]["spec"][
-                "branch"
-            ],
+            "repository_branch": step["configuration"]["configFiles"]["store"][
+                "spec"
+            ].get("branch", None),
+            "repository_commit": step["configuration"]["configFiles"]["store"][
+                "spec"
+            ].get("commitId", None),
             "repository_path": step["configuration"]["configFiles"]["store"]["spec"][
                 "folderPath"
             ],

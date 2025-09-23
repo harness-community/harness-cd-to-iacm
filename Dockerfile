@@ -16,7 +16,6 @@ WORKDIR /app
 COPY /requirements.txt /app/requirements.txt
 RUN python -m pip install -r requirements.txt
 COPY . /app/
-COPY config.toml /app/
 ENTRYPOINT ["python","/app/main.py"]
 
 USER 1000
