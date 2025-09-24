@@ -4,7 +4,7 @@ create harness iacm workspaces from cd terraform steps
 
 traverse a pipeline's history for rendered terraform plan steps and use the configuration to create workspaces or generate terraform for workspaces
 
-this tool is meant to be ran manually via docker and should be used as a starting point, meaning your custom CD terraform implementation may require slight changes to the code, primary the crafting of the workspace name on line `299`
+this tool is meant to be ran manually via docker and should be used as a starting point, meaning your custom CD terraform implementation may require slight changes to the code, primary the crafting of the workspace name in the `build_workspace_name` function
 
 this tool does not yet render secrets used in environment or terraform variables
 

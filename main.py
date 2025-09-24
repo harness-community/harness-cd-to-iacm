@@ -271,6 +271,23 @@ def extract_environment_variables(environment_variables: dict):
     return environment_variables
 
 
+## TODO: you should modify this to fit your workspace naming standards based on the information avalible in the execution context
+def build_workspace_name(
+    config: dict, step: dict, terraform_variables: dict, environment_variables: dict
+):
+    return (
+        config["harness"]["project_id"]
+        + "_"
+        + terraform_variables.get("environment", {}).get("value", "dev")
+        + "_"
+        + step["configuration"]["configFiles"]["store"]["spec"]["folderPath"].replace(
+            "/", "_"
+        )
+        + "_"
+        + terraform_variables.get("region", {}).get("value", "dev")
+    ).lower()
+
+
 if __name__ == "__main__":
     # save workspaces we have created as to not create duplicates
     created_workspaces = []
@@ -313,13 +330,8 @@ if __name__ == "__main__":
             step["configuration"]["varFiles"]
         )
 
-        ## TODO: you should modify this to fit your workspace naming standards based on the information avalible in the execution context
-        name = (
-            step["provisionerIdentifier"]
-            + " "
-            + step["configuration"]["configFiles"]["store"]["spec"]["repoName"]
-            + " "
-            + step["configuration"]["configFiles"]["store"]["spec"]["folderPath"]
+        name = build_workspace_name(
+            config, step, terraform_variables, environment_variables
         )
         if name in created_workspaces:
             logging.info(f"Workspace {name} already created")
