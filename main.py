@@ -42,8 +42,11 @@ def create_workspace(config: dict, workspace: dict) -> dict:
     try:
         resp.raise_for_status()
     except Exception as e:
+        if resp.status_code == 409:
+            logging.warning(f"Workspace {workspace['name']} already exists")
+            return None
         logging.error(resp.text)
-        raise
+        raise e
 
     return resp
 
