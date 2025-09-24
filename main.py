@@ -2,7 +2,7 @@ import json
 import logging
 from os import getenv
 
-import toml
+import tomllib
 from requests import post
 
 import harness_open_api
@@ -293,8 +293,8 @@ if __name__ == "__main__":
     created_workspaces = []
 
     # load in configuration
-    with open(getenv("CONFIG_FILE", "config.toml"), "r") as f:
-        config = toml.load(f)
+    with open(getenv("CONFIG_FILE", "config.toml"), "rb") as f:
+        config = tomllib.load(f)
 
     # set up authentication for the sdk
     configuration = harness_open_api.Configuration()
