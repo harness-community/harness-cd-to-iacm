@@ -288,7 +288,7 @@ def build_workspace_name(
         )
         + "_"
         + terraform_variables.get("region", {}).get("value", "dev")
-    ).lower()
+    ).lower().replace("-", "_")
 
 
 if __name__ == "__main__":
