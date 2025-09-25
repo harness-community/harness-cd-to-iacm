@@ -332,6 +332,10 @@ if __name__ == "__main__":
         terraform_variable_files = extract_terraform_variable_files(
             step["configuration"]["varFiles"]
         )
+        tags = config["terraform"].get("tags", {})
+        if not isinstance(tags, dict):
+            logging.warning("Tags must be a dictionary, will not be used")
+            tags = {}
 
         name = build_workspace_name(
             config, step, terraform_variables, environment_variables
@@ -368,6 +372,7 @@ if __name__ == "__main__":
             "environment_variables": environment_variables,
             "terraform_variables": terraform_variables,
             "terraform_variable_files": terraform_variable_files,
+            "tags": tags,
         }
 
         # add in backend config variables if inline
