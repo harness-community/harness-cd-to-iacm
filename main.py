@@ -152,13 +152,9 @@ def get_pipeline_steps(
 
             for step in details.data.execution_graph.node_map:
                 if details.data.execution_graph.node_map[step].step_type == step_type:
-                    steps.append(
-                        details.data.execution_graph.node_map[step].step_parameters[
-                            "spec"
-                        ]
-                    )
-
-    return steps
+                    yield details.data.execution_graph.node_map[step].step_parameters[
+                        "spec"
+                    ]
 
 
 def extract_provider_connectors(provider_credential: dict):
@@ -279,16 +275,20 @@ def build_workspace_name(
     config: dict, step: dict, terraform_variables: dict, environment_variables: dict
 ):
     return (
-        config["harness"]["project_id"]
-        + "_"
-        + terraform_variables.get("environment", {}).get("value", "dev")
-        + "_"
-        + step["configuration"]["configFiles"]["store"]["spec"]["folderPath"].replace(
-            "/", "_"
+        (
+            config["harness"]["project_id"]
+            + "_"
+            + terraform_variables.get("environment", {}).get("value", "dev")
+            + "_"
+            + step["configuration"]["configFiles"]["store"]["spec"][
+                "folderPath"
+            ].replace("/", "_")
+            + "_"
+            + terraform_variables.get("region", {}).get("value", "dev")
         )
-        + "_"
-        + terraform_variables.get("region", {}).get("value", "dev")
-    ).lower().replace("-", "_")
+        .lower()
+        .replace("-", "_")
+    )
 
 
 if __name__ == "__main__":
