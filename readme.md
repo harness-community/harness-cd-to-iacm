@@ -40,6 +40,8 @@ provisioner = "opentofu"
 provisioner_version = "1.8.0"
 # tags to add to the workspace
 tags = { created_by = "harness-cd-to-iacm" }
+# connectors to add to the workspace
+provider_connectors = [{connector_ref = "account.my_aws_connector",type = "aws"}]
 ```
 
 you can specify the location of the config file by setting the `CONFIG_FILE` environment variable

@@ -337,6 +337,9 @@ if __name__ == "__main__":
             logging.warning("Tags must be a dictionary, will not be used")
             tags = {}
 
+        # apply any defaults specified
+        provider_connectors.extend(config["terraform"].get("provider_connectors", []))
+        # build name based on function
         name = build_workspace_name(
             config, step, terraform_variables, environment_variables
         )
