@@ -117,6 +117,7 @@ def get_pipeline_steps(
     project_id: str,
     step_type: str,
     pipeline_id: str = None,
+    execution_identifiers: list[str] = None,
 ):
     executions_api = harness_open_api.PipelineExecutionDetailsApi(
         harness_open_api.ApiClient(api_configuration)
@@ -140,7 +141,17 @@ def get_pipeline_steps(
     )
 
     steps = []
-    for execution in executions.data.content:
+    # if a list of execution ids is passed, only run those
+    filtered_executions = (
+        [
+            x
+            for x in executions.data.content
+            if x.plan_execution_id in execution_identifiers
+        ]
+        if execution_identifiers
+        else executions.data.content
+    )
+    for execution in filtered_executions:
         for stage in execution.layout_node_map:
             details = pipeline_execution_details_api.get_execution_detail_v2(
                 account_identifier=config["harness"]["account_id"],
@@ -311,6 +322,7 @@ if __name__ == "__main__":
         config["harness"]["project_id"],
         config["harness"].get("step_type", "TERRAFORM_PLAN_V2"),
         config["harness"]["pipeline_identifier"],
+        config["harness"].get("execution_identifiers", []),
     )
 
     for step in steps:
@@ -339,6 +351,7 @@ if __name__ == "__main__":
 
         # apply any defaults specified
         provider_connectors.extend(config["terraform"].get("provider_connectors", []))
+
         # build name based on function
         name = build_workspace_name(
             config, step, terraform_variables, environment_variables

@@ -38,10 +38,12 @@ pipeline_identifier = "legacy_cd_tf_example"
 provisioner = "opentofu"
 # terraform provisioner version to use in iacm
 provisioner_version = "1.8.0"
-# tags to add to the workspace
+# tags to add to the workspace (optional)
 tags = { created_by = "harness-cd-to-iacm" }
-# connectors to add to the workspace
+# connectors to add to the workspace (optional)
 provider_connectors = [{connector_ref = "account.my_aws_connector",type = "aws"}]
+# specify a list of execution identifiers to run (optional)
+execution_identifiers = ["VHtLmGk3RyeMmXNqg7rI9A"]
 ```
 
 you can specify the location of the config file by setting the `CONFIG_FILE` environment variable
