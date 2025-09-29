@@ -56,6 +56,30 @@ docker run --rm -v "$(pwd)/config.toml:/harness/config.toml" -e CONFIG_FILE=/har
 ```
 this command mounts the config file into the container and sets the environment variable to point to it
 
+## extractions
+
+if you have additional dynamic workspace setting you would like to set based on the content of the existing workspace settings, you can pass custom Python functions which take in the default workspace configuration and further modify it as you see fit
+
+```toml
+[extractions]
+some_extraction = "path.to.my.extraction.function"
+```
+
+the function should take in the resulting workspace configuration and return the modified configuration
+
+for example you could create an `extractions.py` in the local directory:
+```python
+def some_extraction(workspace_config):
+    workspace_config["environment_variables"]["MY_VARIABLE"] = {"key": "MY_VARIABLE", "value": "my_value", "value_type": "string"}
+    return workspace_config
+```
+
+and then add it to the config.toml:
+```toml
+[extractions]
+some_extraction = "extractions.some_extraction"
+```
+
 ## developemnt notes
 
 secrets are rendered in the detailed execution view (needed to resolve context variables) as `*******` so we have to go back and resolve the pipeline yaml to find the actual secret used

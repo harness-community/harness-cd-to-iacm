@@ -1,6 +1,7 @@
 import json
 import logging
 from os import getenv
+import importlib
 
 import tomllib
 from requests import post
@@ -302,6 +303,18 @@ def build_workspace_name(
     )
 
 
+def run_extractions(configuration: dict, workspace_payload: dict) -> dict:
+    for extraction in configuration.get("extractions", []):
+        function_path = configuration["extractions"][extraction]
+        module_name, function_name = function_path.split(".")
+        module = importlib.import_module(module_name)
+        function_to_call = getattr(module, function_name)
+
+        workspace_payload = function_to_call(workspace_payload)
+
+    return workspace_payload
+
+
 if __name__ == "__main__":
     # save workspaces we have created as to not create duplicates
     created_workspaces = []
@@ -423,6 +436,8 @@ if __name__ == "__main__":
                     config["harness"]["pipeline_identifier"],
                 )
                 print(pipeline)
+
+        workspace_payload = run_extractions(config, workspace_payload)
 
         # show and create workspace
         print(json.dumps(workspace_payload, indent=4))
