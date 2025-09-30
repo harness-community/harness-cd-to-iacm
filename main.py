@@ -52,7 +52,9 @@ def create_workspace(config: dict, workspace: dict) -> dict:
     return resp
 
 
-def convert_variables(payload: str, prefix: str = "") -> dict[str, dict[str, str]]:
+def convert_variables(
+    payload: str, prefix: str = "", prepend_key: bool = False
+) -> dict[str, dict[str, str]]:
     """
     convert variables in a string to workspace variables
 
@@ -80,6 +82,9 @@ def convert_variables(payload: str, prefix: str = "") -> dict[str, dict[str, str
             value_type = "secret"
         else:
             value_type = "string"
+
+        if prepend_key:
+            value = key + "=" + value
 
         variables[prefix + key] = {
             "key": prefix + key,
@@ -413,6 +418,7 @@ if __name__ == "__main__":
                             "terraformBackendConfigSpec"
                         ]["content"],
                         "PLUGIN_INIT_BACKEND_CONFIG_",
+                        prepend_key=True,
                     )
                 )
             else:
