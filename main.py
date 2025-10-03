@@ -167,6 +167,13 @@ def get_pipeline_steps(
                 stage_node_id=stage,
             )
 
+            print(details.data.pipeline_execution_summary.modules)
+            print(
+                details.data.pipeline_execution_summary.module_info["cd"].get(
+                    "serviceIdentifiers", None
+                )
+            )  # .module_info.cd.serviceIdentifiers)
+
             for step in details.data.execution_graph.node_map:
                 if details.data.execution_graph.node_map[step].step_type == step_type:
                     yield details.data.execution_graph.node_map[step].step_parameters[
@@ -301,6 +308,10 @@ def build_workspace_name(
                 "folderPath"
             ].replace("/", "_")
             + "_"
+            + environment_variables.get("PLUGIN_INIT_BACKEND_CONFIG_key", {})
+            .get("value", "")
+            .split("/")[-3]
+            + "_"
             + terraform_variables.get("region", {}).get("value", "dev")
         )
         .lower()
@@ -370,22 +381,8 @@ if __name__ == "__main__":
         # apply any defaults specified
         provider_connectors.extend(config["terraform"].get("provider_connectors", []))
 
-        # build name based on function
-        name = build_workspace_name(
-            config, step, terraform_variables, environment_variables
-        )
-        if name in created_workspaces:
-            logging.info(f"Workspace {name} already created")
-            continue
-
         # assemble payload
         workspace_payload = {
-            "identifier": name.replace(" ", "_")
-            .replace("/", "_")
-            .replace(".", "_")
-            .replace("-", "_")
-            .lower(),
-            "name": name.replace(".", "_"),
             "provisioner": config["terraform"]["provisioner"],
             "provisioner_version": config["terraform"]["provisioner_version"],
             "provider_connector": "",
@@ -444,6 +441,22 @@ if __name__ == "__main__":
                 print(pipeline)
 
         workspace_payload = run_extractions(config, workspace_payload)
+
+        # build name based on function
+        name = build_workspace_name(
+            config, step, terraform_variables, environment_variables
+        )
+        if name in created_workspaces:
+            logging.info(f"Workspace {name} already created")
+            continue
+        workspace_payload["identifier"] = (
+            name.replace(" ", "_")
+            .replace("/", "_")
+            .replace(".", "_")
+            .replace("-", "_")
+            .lower()
+        )
+        workspace_payload["name"] = name.replace(".", "_")
 
         # show and create workspace
         print(json.dumps(workspace_payload, indent=4))
