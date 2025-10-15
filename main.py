@@ -9,7 +9,7 @@ from requests import post
 import harness_open_api
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=getenv("LOG_LEVEL", "INFO"))
 
 BACKEND_DOCS = "https://developer.harness.io/docs/infra-as-code-management/remote-backends/init-configuration/#set-environment-variables"
 
@@ -158,7 +158,9 @@ def get_pipeline_steps(
         else executions.data.content
     )
     for execution in filtered_executions:
+        logging.debug("Execution: %s", execution.plan_execution_id)
         for stage in execution.layout_node_map:
+            logging.debug("Stage: %s", stage)
             details = pipeline_execution_details_api.get_execution_detail_v2(
                 account_identifier=config["harness"]["account_id"],
                 org_identifier=config["harness"]["org_id"],
@@ -167,15 +169,9 @@ def get_pipeline_steps(
                 stage_node_id=stage,
             )
 
-            print(details.data.pipeline_execution_summary.modules)
-            print(
-                details.data.pipeline_execution_summary.module_info["cd"].get(
-                    "serviceIdentifiers", None
-                )
-            )  # .module_info.cd.serviceIdentifiers)
-
             for step in details.data.execution_graph.node_map:
                 if details.data.execution_graph.node_map[step].step_type == step_type:
+                    logging.debug("Step found: %s", step)
                     yield details.data.execution_graph.node_map[step].step_parameters[
                         "spec"
                     ]
