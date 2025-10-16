@@ -294,21 +294,22 @@ def extract_environment_variables(environment_variables: dict):
 def build_workspace_name(
     config: dict, step: dict, terraform_variables: dict, environment_variables: dict
 ):
+    # allow users to pass in custom python function to build workspace name
+    if name_function := config["terraform"].get("name_function", None):
+        module_name, function_name = name_function.split(".")
+        module = importlib.import_module(module_name)
+        function_to_call = getattr(module, function_name)
+
+        return function_to_call(
+            config, step, terraform_variables, environment_variables
+        )
+
+    # otherwise default format
     return (
         (
-            config["harness"]["project_id"]
-            + "_"
-            + terraform_variables.get("environment", {}).get("value", "dev")
-            + "_"
-            + step["configuration"]["configFiles"]["store"]["spec"][
-                "folderPath"
-            ].replace("/", "_")
-            + "_"
-            + environment_variables.get("PLUGIN_INIT_BACKEND_CONFIG_key", {})
-            .get("value", "")
-            .split("/")[-3]
-            + "_"
-            + terraform_variables.get("region", {}).get("value", "dev")
+            step["configuration"]["configFiles"]["store"]["spec"]["folderPath"].replace(
+                "/", "_"
+            )
         )
         .lower()
         .replace("-", "_")
