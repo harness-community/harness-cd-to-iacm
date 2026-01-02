@@ -25,7 +25,7 @@ endpoint = "https://app.harness.io"
 # target harness account id
 account_id = "AM8HCbDiTXGQNrTIhNl7qQ"
 # api key for harness authentication
-platform_api_key = "pat.AM8HCbDiTXGQNrTIhNl7qQ.68bee55116344d7b8dad4ff7.Oni91Bw4TiGGjRXtwEeG"
+platform_api_key = "pat.AM8HCbDiTXGQNrTIhNl7qQ.xxx.xxx"
 # organization id of target project
 org_id = "Modules"
 # project id of target project
